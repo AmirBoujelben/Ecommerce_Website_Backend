@@ -115,5 +115,36 @@ module.exports={
         }
         
 
+    },
+    
+    addProduct: async(request,response) =>
+    {
+        console.log('New Product to add : ',request.body)
+        const {product_id,name,category,new_price,old_price} = request.body
+        if (!product_id || !name || !category || !new_price || !old_price)
+        {
+            return response.status(400).json({message:"Please provide all atributes"})
+        }
+        try {
+            const product =await Product.findOne({product_id})
+            if (product) throw Error("Product Already Exists")
+            const newProduct = new Product({
+                product_id,
+                name,
+                category,
+                new_price,
+                old_price
+            })
+            const savedProduct = await newProduct.save()
+            if (!savedProduct) throw Error("Something went wrong saving the new product")
+        
+            response.status(200).json({message:"New Product succesfully saved in the database"})
+        }
+        catch(error)
+        {
+            console.log(error)
+            response.status(400).json({message: error.message})
+        }
+
     }
 }
